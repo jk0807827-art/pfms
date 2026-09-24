@@ -1438,6 +1438,350 @@ class core{
         }
     }
 
+
+
+    // =====================================================
+    // =====================================================
+    //  ADMIN — SITE SETTINGS (CMS)
+    // =====================================================
+    // =====================================================
+
+    public function get_settings()
+    {
+        try{
+
+            $sql = "SELECT setting_key, setting_value FROM site_settings";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute();
+
+            $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            $out = [];
+            foreach($rows as $row){
+                $out[$row['setting_key']] = $row['setting_value'];
+            }
+
+            return $out;
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function get_setting($key, $default = '')
+    {
+        try{
+
+            $sql = "
+                SELECT setting_value
+                FROM site_settings
+                WHERE setting_key = :setting_key
+                LIMIT 1
+            ";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute([":setting_key" => $key]);
+
+            $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+            return $row ? $row['setting_value'] : $default;
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function update_settings($pairs)
+    {
+        try{
+
+            $sql = "
+                INSERT INTO site_settings (setting_key, setting_value)
+                VALUES (:setting_key, :setting_value)
+                ON DUPLICATE KEY UPDATE
+                    setting_value = VALUES(setting_value)
+            ";
+
+            $statement = $this->db->prepare($sql);
+
+            foreach($pairs as $key => $value){
+                $statement->execute([
+                    ":setting_key"   => $key,
+                    ":setting_value" => $value
+                ]);
+            }
+
+            return true;
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+
+    // =====================================================
+    // =====================================================
+    //  ADMIN — ABOUT PAGE TEAM MEMBERS
+    // =====================================================
+    // =====================================================
+
+    public function get_team_members()
+    {
+        try{
+
+            $sql = "
+                SELECT member_id, name, student_id, role, photo, sort_order
+                FROM team_members
+                ORDER BY sort_order ASC, member_id ASC
+            ";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute();
+
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function get_team_member($member_id)
+    {
+        try{
+
+            $sql = "
+                SELECT member_id, name, student_id, role, photo, sort_order
+                FROM team_members
+                WHERE member_id = :member_id
+                LIMIT 1
+            ";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute([":member_id" => $member_id]);
+
+            return $statement->fetch(PDO::FETCH_ASSOC);
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function create_team_member($name, $student_id, $role, $photo, $sort_order = 0)
+    {
+        try{
+
+            $sql = "
+                INSERT INTO team_members (name, student_id, role, photo, sort_order)
+                VALUES (:name, :student_id, :role, :photo, :sort_order)
+            ";
+
+            $statement = $this->db->prepare($sql);
+
+            $statement->execute([
+                ":name"       => $name,
+                ":student_id" => $student_id,
+                ":role"       => $role,
+                ":photo"      => $photo,
+                ":sort_order" => $sort_order
+            ]);
+
+            return (int) $this->db->lastInsertId();
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function update_team_member($member_id, $name, $student_id, $role, $photo = null)
+    {
+        try{
+
+            $sql = "
+                UPDATE team_members
+                SET name = :name,
+                    student_id = :student_id,
+                    role = :role
+            ";
+
+            $params = [
+                ":name"       => $name,
+                ":student_id" => $student_id,
+                ":role"       => $role,
+                ":member_id"  => $member_id
+            ];
+
+            if($photo !== null){
+                $sql .= ", photo = :photo ";
+                $params[":photo"] = $photo;
+            }
+
+            $sql .= " WHERE member_id = :member_id ";
+
+            $statement = $this->db->prepare($sql);
+
+            return $statement->execute($params);
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function delete_team_member($member_id)
+    {
+        try{
+
+            $sql = "DELETE FROM team_members WHERE member_id = :member_id";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute([":member_id" => $member_id]);
+
+            return $statement->rowCount() > 0;
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+
+    // =====================================================
+    // =====================================================
+    //  ADMIN — USERS & DASHBOARD STATS
+    // =====================================================
+    // =====================================================
+
+    public function is_admin($user_id)
+    {
+        try{
+
+            $sql = "
+                SELECT is_admin
+                FROM users
+                WHERE user_id = :user_id
+                LIMIT 1
+            ";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute([":user_id" => $user_id]);
+
+            $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+            return $row && (int)$row['is_admin'] === 1;
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function get_all_users()
+    {
+        try{
+
+            $sql = "
+                SELECT user_id, full_name, email, phone, is_active, is_admin, last_login_at, created_at
+                FROM users
+                ORDER BY created_at DESC
+            ";
+
+            $statement = $this->db->prepare($sql);
+            $statement->execute();
+
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function set_user_active($user_id, $isActive)
+    {
+        try{
+
+            $sql = "
+                UPDATE users
+                SET is_active = :is_active, updated_at = NOW()
+                WHERE user_id = :user_id
+            ";
+
+            $statement = $this->db->prepare($sql);
+
+            return $statement->execute([
+                ":is_active" => $isActive ? 1 : 0,
+                ":user_id"   => $user_id
+            ]);
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function set_user_admin($user_id, $isAdmin)
+    {
+        try{
+
+            $sql = "
+                UPDATE users
+                SET is_admin = :is_admin, updated_at = NOW()
+                WHERE user_id = :user_id
+            ";
+
+            $statement = $this->db->prepare($sql);
+
+            return $statement->execute([
+                ":is_admin" => $isAdmin ? 1 : 0,
+                ":user_id"  => $user_id
+            ]);
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
+
+    public function get_admin_dashboard_stats()
+    {
+        try{
+
+            $stats = [];
+
+            $stats['total_users'] = (int) $this->db
+                ->query("SELECT COUNT(*) FROM users")
+                ->fetchColumn();
+
+            $stats['active_users'] = (int) $this->db
+                ->query("SELECT COUNT(*) FROM users WHERE is_active = 1")
+                ->fetchColumn();
+
+            $stats['total_income'] = (float) $this->db
+                ->query("SELECT COALESCE(SUM(amount),0) FROM income")
+                ->fetchColumn();
+
+            $stats['total_expenses'] = (float) $this->db
+                ->query("SELECT COALESCE(SUM(amount),0) FROM expenses")
+                ->fetchColumn();
+
+            $stats['total_investments'] = (int) $this->db
+                ->query("SELECT COUNT(*) FROM investments")
+                ->fetchColumn();
+
+            return $stats;
+
+        }catch(\Throwable $th){
+            throw $th;
+        }
+    }
+
 }
 
 

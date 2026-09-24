@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 19, 2026 at 06:53 AM
+-- Generation Time: Sep 24, 2026 at 06:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -35,7 +35,7 @@ CREATE TABLE `budgets` (
   `amount` decimal(12,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `budgets`
@@ -96,7 +96,7 @@ CREATE TABLE `expenses` (
   `description` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `expenses`
@@ -127,7 +127,7 @@ CREATE TABLE `income` (
   `description` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `income`
@@ -156,7 +156,7 @@ CREATE TABLE `investments` (
   `gain_loss` decimal(13,2) GENERATED ALWAYS AS (`current_value` - `amount_invested`) STORED,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `investments`
@@ -184,6 +184,62 @@ CREATE TABLE `password_resets` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `site_settings`
+--
+
+CREATE TABLE `site_settings` (
+  `setting_key` varchar(100) NOT NULL,
+  `setting_value` text DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `site_settings`
+--
+
+INSERT INTO `site_settings` (`setting_key`, `setting_value`, `updated_at`) VALUES
+('about_hero_text1', 'We are a team of four students who came together to design and develop PFMS — Personal Finance Management System. Our goal is to create a simple, practical and user-friendly platform that helps people organize their income, expenses, budgets and investments in one place.', '2026-09-24 16:44:32'),
+('about_hero_text2', 'PFMS was created as a student project to combine our knowledge of web development, database management, user interface design and software engineering into a useful real-world application.', '2026-09-24 16:44:32'),
+('about_hero_title', 'Who We Are', '2026-09-24 16:44:32'),
+('about_team_intro', 'Four students. One project. A shared goal of making personal finance easier to understand and manage.', '2026-09-24 16:44:32'),
+('about_team_title', 'Meet Our Team', '2026-09-24 16:44:32'),
+('footer_text', '© 2026 PFMS. Personal finance tracking & awareness — not financial advice.', '2026-09-24 16:44:32'),
+('hero_image', 'assets/img/header-b.PNG', '2026-09-24 16:44:32'),
+('hero_subtitle', 'PFMS brings your income, expenses, budgets and investments together in a single ledger — so you always know exactly where you stand, without juggling spreadsheets and screenshots.', '2026-09-24 16:44:32'),
+('hero_title', 'One page for every dollar in, every dollar out.', '2026-09-24 16:44:32'),
+('logo_image', '', '2026-09-24 16:44:32'),
+('site_name', 'PFMS', '2026-09-24 16:44:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `team_members`
+--
+
+CREATE TABLE `team_members` (
+  `member_id` int(10) UNSIGNED NOT NULL,
+  `name` varchar(120) NOT NULL,
+  `student_id` varchar(60) DEFAULT NULL,
+  `role` varchar(120) NOT NULL DEFAULT 'Team Member',
+  `photo` varchar(255) DEFAULT NULL,
+  `sort_order` int(10) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `team_members`
+--
+
+INSERT INTO `team_members` (`member_id`, `name`, `student_id`, `role`, `photo`, `sort_order`, `created_at`) VALUES
+(5, 'Junaid Khan', 'S20250141', 'Group Member', 'assets/img/uploads/img_a466ee56b27494cd.png', 99, '2026-09-24 16:51:25'),
+(6, 'Bibek Lamichhane', 'S20250270', 'Group Member', 'assets/img/uploads/img_b4640590251fae5b.png', 99, '2026-09-24 16:53:37'),
+(7, 'Prachi Kiran Patil', 'S20250577', 'Group Member', 'assets/img/uploads/img_b7f84acc609f392c.png', 99, '2026-09-24 16:54:24'),
+(8, 'Sangeet Kumar', 'S20250708', 'Group Member', 'assets/img/uploads/img_03cbed7609c93ded.png', 99, '2026-09-24 16:54:53'),
+(9, 'Raj Puri', 'S20241273', 'Group Member', 'assets/img/uploads/img_dd18446c100c2a3d.png', 99, '2026-09-24 16:55:25');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -194,6 +250,7 @@ CREATE TABLE `users` (
   `phone` varchar(20) NOT NULL,
   `password_hash` varchar(255) NOT NULL COMMENT 'Output of PHP password_hash(), never a plain password',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0,
   `last_login_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -203,9 +260,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `full_name`, `email`, `phone`, `password_hash`, `is_active`, `last_login_at`, `created_at`, `updated_at`) VALUES
-(3, 'Prachi Kiran Patil', 'prachi@pfms.com', '+6123456789', '$2y$10$0I.L0M55b1MvnWIJPEGqHOBC3L0hP8c8vBJsMFyOgcCQwQjUBKr/a', 1, NULL, '2026-09-17 14:45:14', '2026-09-19 03:57:11'),
-(4, 'Junaid Khan', 'junaid@pfms.com', '+61444560621', '$2y$10$jzSASZNISQWNXpTrih7az.xCXSfoI7PvOjkk/mKVtVq53I4FtMuU.', 1, NULL, '2026-09-17 14:49:56', '2026-09-17 16:30:41');
+INSERT INTO `users` (`user_id`, `full_name`, `email`, `phone`, `password_hash`, `is_active`, `is_admin`, `last_login_at`, `created_at`, `updated_at`) VALUES
+(3, 'Prachi Kiran Patil', 'prachi@pfms.com', '+6123456789', '$2y$10$0I.L0M55b1MvnWIJPEGqHOBC3L0hP8c8vBJsMFyOgcCQwQjUBKr/a', 1, 0, NULL, '2026-09-17 14:45:14', '2026-09-19 03:57:11'),
+(4, 'Junaid Khan', 'junaid@pfms.com', '+61444560621', '$2y$10$jzSASZNISQWNXpTrih7az.xCXSfoI7PvOjkk/mKVtVq53I4FtMuU.', 1, 0, NULL, '2026-09-17 14:49:56', '2026-09-17 16:30:41'),
+(5, 'Site Admin', 'admin@pfms.com', '+00000000000', '$2b$10$5.dGaWDNMCrF9XkFIUNLyeMZMx.OH1Q.gcwHjXUyCDDIFDnQ/zfNW', 1, 1, NULL, '2026-09-24 16:44:32', '2026-09-24 16:44:32');
 
 -- --------------------------------------------------------
 
@@ -357,6 +415,18 @@ ALTER TABLE `password_resets`
   ADD KEY `idx_reset_user` (`user_id`);
 
 --
+-- Indexes for table `site_settings`
+--
+ALTER TABLE `site_settings`
+  ADD PRIMARY KEY (`setting_key`);
+
+--
+-- Indexes for table `team_members`
+--
+ALTER TABLE `team_members`
+  ADD PRIMARY KEY (`member_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -371,7 +441,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budgets`
 --
 ALTER TABLE `budgets`
-  MODIFY `budget_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `budget_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -383,19 +453,19 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `expense_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `expense_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `income`
 --
 ALTER TABLE `income`
-  MODIFY `income_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `income_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `investments`
 --
 ALTER TABLE `investments`
-  MODIFY `investment_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `investment_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
@@ -404,10 +474,16 @@ ALTER TABLE `password_resets`
   MODIFY `reset_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `team_members`
+--
+ALTER TABLE `team_members`
+  MODIFY `member_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

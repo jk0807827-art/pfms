@@ -1,10 +1,41 @@
+<?php
+require_once 'config/db.php';
+require_once 'include/core.php';
+
+$data = new core($conn);
+$settings = $data->get_settings();
+$team = $data->get_team_members();
+
+function pfms_setting($settings, $key, $default = ''){
+    return isset($settings[$key]) && $settings[$key] !== '' ? $settings[$key] : $default;
+}
+
+$siteName      = pfms_setting($settings, 'site_name', 'PFMS');
+$logoImage     = pfms_setting($settings, 'logo_image', '');
+$aboutTitle    = pfms_setting($settings, 'about_hero_title', 'Who We Are');
+$aboutText1    = pfms_setting($settings, 'about_hero_text1', '');
+$aboutText2    = pfms_setting($settings, 'about_hero_text2', '');
+$teamTitle     = pfms_setting($settings, 'about_team_title', 'Meet Our Team');
+$teamIntro     = pfms_setting($settings, 'about_team_intro', '');
+$footerText    = pfms_setting($settings, 'footer_text', '© 2026 PFMS. Personal finance tracking & awareness — not financial advice.');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Us — PFMS</title>
+  <title>About Us — <?= htmlspecialchars($siteName) ?></title>
+  <script>
+  (function(){
+    try{
+      var t = localStorage.getItem('pfms-theme');
+      if(!t){ t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+      document.documentElement.setAttribute('data-theme', t);
+    }catch(e){}
+  })();
+  </script>
   <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/theme.js" defer></script>
 
   <style>
     .about-hero {
@@ -90,11 +121,22 @@
   <!-- NAVIGATION -->
   <nav class="pub-nav">
     <div class="brand">
-      <div class="name"><a href="index.php" style="text-decoration: none;">PFMS</a></div>
+      <div class="name">
+        <a href="index.php" style="text-decoration: none;display:flex;align-items:center;gap:.5em;">
+          <?php if($logoImage): ?>
+            <img src="<?= htmlspecialchars($logoImage) ?>" alt="<?= htmlspecialchars($siteName) ?>" style="height:28px;width:auto;display:block;">
+          <?php else: ?>
+            <?= htmlspecialchars($siteName) ?>
+          <?php endif; ?>
+        </a>
+      </div>
     </div>
 
     <div class="links">
       <a href="index.php">Home</a>
+      <button type="button" class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="ico" data-theme-icon>&#9789;</span><span data-theme-label>Dark mode</span>
+      </button>
       <a href="login.php">Log in</a>
       <a class="btn-ledger brass sm" href="register.php">Get started</a>
     </div>
@@ -105,22 +147,16 @@
   <header class="about-hero">
     <div style="max-width: 750px;">
       <h1 style="font-size: 3.1rem; line-height: 1.1;">
-        Who We Are
+        <?= htmlspecialchars($aboutTitle) ?>
       </h1>
 
-      <p>
-        We are a team of four students who came together to design and
-        develop PFMS — Personal Finance Management System. Our goal is to
-        create a simple, practical and user-friendly platform that helps
-        people organize their income, expenses, budgets and investments
-        in one place.
-      </p>
+      <?php if($aboutText1): ?>
+      <p><?= nl2br(htmlspecialchars($aboutText1)) ?></p>
+      <?php endif; ?>
 
-      <p>
-        PFMS was created as a student project to combine our knowledge of
-        web development, database management, user interface design and
-        software engineering into a useful real-world application.
-      </p>
+      <?php if($aboutText2): ?>
+      <p><?= nl2br(htmlspecialchars($aboutText2)) ?></p>
+      <?php endif; ?>
     </div>
   </header>
 
@@ -129,95 +165,43 @@
   <section class="team-section">
 
     <div class="team-intro">
-      <h2>Meet Our Team</h2>
+      <h2><?= htmlspecialchars($teamTitle) ?></h2>
 
-      <p>
-        Four students. One project. A shared goal of making personal
-        finance easier to understand and manage.
-      </p>
+      <?php if($teamIntro): ?>
+      <p><?= htmlspecialchars($teamIntro) ?></p>
+      <?php endif; ?>
     </div>
 
 
     <div class="team-grid">
 
-      <!-- MEMBER 1 -->
+      <?php foreach($team as $member): ?>
       <div class="team-card">
         <img
-          src="assets/img/header-b.PNG"
-          alt="Student 1"
+          src="<?= htmlspecialchars($member['photo'] ?: 'assets/img/header-b.PNG') ?>"
+          alt="<?= htmlspecialchars($member['name']) ?>"
           class="team-photo"
         >
 
-        <h3>Student Name 1</h3>
+        <h3><?= htmlspecialchars($member['name']) ?></h3>
 
+        <?php if($member['student_id']): ?>
         <div class="student-id">
-          Student ID: YOUR-ID-001
+          Student ID: <?= htmlspecialchars($member['student_id']) ?>
         </div>
+        <?php endif; ?>
 
         <div class="team-role">
-          Team Member
+          <?= htmlspecialchars($member['role']) ?>
         </div>
       </div>
+      <?php endforeach; ?>
 
-
-      <!-- MEMBER 2 -->
-      <div class="team-card">
-        <img
-          src="assets/img/header-b.PNG"
-          alt="Student 2"
-          class="team-photo"
-        >
-
-        <h3>Student Name 2</h3>
-
-        <div class="student-id">
-          Student ID: YOUR-ID-002
-        </div>
-
-        <div class="team-role">
-          Team Member
-        </div>
+      <?php if(empty($team)): ?>
+      <div class="team-card" style="grid-column:1/-1;color:var(--ink-faint);">
+        Team members will appear here once added from the admin panel.
       </div>
-
-
-      <!-- MEMBER 3 -->
-      <div class="team-card">
-        <img
-          src="assets/img/header-b.PNG"
-          alt="Student 3"
-          class="team-photo"
-        >
-
-        <h3>Student Name 3</h3>
-
-        <div class="student-id">
-          Student ID: YOUR-ID-003
-        </div>
-
-        <div class="team-role">
-          Team Member
-        </div>
-      </div>
-
-
-      <!-- MEMBER 4 -->
-      <div class="team-card">
-        <img
-          src="assets/img/header-b.PNG"
-          alt="Student 4"
-          class="team-photo"
-        >
-
-        <h3>Student Name 4</h3>
-
-        <div class="student-id">
-          Student ID: YOUR-ID-004
-        </div>
-
-        <div class="team-role">
-          Team Member
-        </div>
-      </div>
+      <?php endif; ?>
 
     </div>
   </section>
@@ -235,8 +219,7 @@
   ">
 
     <div>
-      © 2026 PFMS. Personal finance tracking &amp; awareness —
-      not financial advice.
+      <?= htmlspecialchars($footerText) ?>
     </div>
 
     <div style="display:flex; gap:1.5rem;">

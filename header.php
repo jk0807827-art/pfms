@@ -22,8 +22,18 @@ if($sidebarInitials === ''){
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $pageTitle ?? 'Personal Finance Management System'; ?></title>
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem('pfms-theme');
+    if(!t){ t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){}
+})();
+</script>
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="assets/js/theme.js" defer></script>
 
 </head>
 <body>
@@ -72,12 +82,19 @@ if($sidebarInitials === ''){
         <span class="ico">&#9881;</span><span>Settings</span>
       </a>
 
-    
-    
+      <?php if(!empty($_SESSION['is_admin'])): ?>
+      <a class="nav-link" href="admin/dashboard.php" style="margin-top:.6em;border-top:1px solid rgba(238,234,224,.12);padding-top:1em;">
+        <span class="ico">&#9733;</span><span>Admin Panel</span>
+      </a>
+      <?php endif; ?>
+
     </nav>
     <div class="sidebar-foot">
       <div class="who"><strong><?= htmlspecialchars($sidebarUserName) ?></strong><?= htmlspecialchars($sidebarUserEmail) ?></div>
-      <a class="btn-ledger ghost sm" href="logout.php" id="logoutBtn" style="width:100%;color:var(--paper);border-color:rgba(238,234,224,.3)">Log out</a>
+      <button type="button" class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="ico" data-theme-icon>&#9789;</span><span data-theme-label>Dark mode</span>
+      </button>
+      <a class="btn-ledger ghost sm" href="logout.php" id="logoutBtn" style="width:100%;color:var(--sidebar-ink);border-color:rgba(238,234,224,.3);margin-top:.6em;">Log out</a>
     </div>
   </aside>
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>

@@ -21,6 +21,7 @@ class login_process{
                     phone,
                     password_hash,
                     is_active,
+                    is_admin,
                     last_login_at,
                     created_at,
                     updated_at

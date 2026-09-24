@@ -71,9 +71,14 @@ if($type == 1){
             /*
              * ADMIN CHECK
              *
-             * Replace this email with your actual admin email.
+             * Driven by the users.is_admin column, set from the
+             * admin panel (Users page) or directly in the database.
              */
-            if($user['email'] == "admin@pfms.app"){
+            $isAdmin = isset($user['is_admin']) && (int)$user['is_admin'] === 1;
+
+            $_SESSION['is_admin'] = $isAdmin ? 1 : 0;
+
+            if($isAdmin){
 
                 echo json_encode([
                     "statusCode" => 200,

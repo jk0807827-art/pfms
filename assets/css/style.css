@@ -25,6 +25,38 @@
 
   --radius: 3px;
   --sidebar-w: 248px;
+
+  /* Sidebar is always the dark navy panel, in both themes —
+     it is NOT tied to --ink/--paper, which flip between themes. */
+  --sidebar-bg:  #16233A;
+  --sidebar-ink: #EEEAE0;
+}
+
+/* ---------- Dark theme ----------
+   Applied when <html data-theme="dark">. Same variable names,
+   so every component above works unchanged in either mode.
+*/
+html[data-theme="dark"]{
+  --ink:        #EDEFF4;
+  --ink-soft:   #C3C9D6;
+  --ink-faint:  #8A93A8;
+  --paper:      #161A24;
+  --paper-deep: #1E2330;
+  --card:       #20263A;
+  --line:       #333B4E;
+  --line-soft:  #2A3040;
+  --brass:      #E0565B;
+  --brass-deep: #F0898D;
+  --brass-tint: #3A2A2E;
+  --gain:       #6FBF95;
+  --gain-tint:  #1D3327;
+  --loss:       #E28379;
+  --loss-tint:  #3A2222;
+  --white:      #ffffff;
+
+  /* Sidebar stays the same dark navy panel as light mode. */
+  --sidebar-bg:  #16233A;
+  --sidebar-ink: #EEEAE0;
 }
 
 *{ box-sizing:border-box; }
@@ -37,7 +69,23 @@ body{
   font-size:15px;
   line-height:1.55;
   -webkit-font-smoothing:antialiased;
+  transition:background .15s ease, color .15s ease;
 }
+
+/* ---------- Theme toggle switch ---------- */
+.theme-toggle{
+  display:inline-flex; align-items:center; gap:.5em;
+  border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+  border-radius:20px; padding:.35em .75em; font-size:.78rem; font-weight:600;
+  cursor:pointer; line-height:1; font-family:var(--font-body);
+}
+.theme-toggle:hover{ background:var(--paper-deep); }
+.theme-toggle .ico{ font-size:.95rem; }
+.sidebar .theme-toggle{
+  width:100%; justify-content:center; margin-top:.7em;
+  background:transparent; border-color:rgba(238,234,224,.3); color:var(--sidebar-ink);
+}
+.sidebar .theme-toggle:hover{ background:rgba(238,234,224,.08); }
 
 h1,h2,h3,h4{
   font-family:var(--font-display);
@@ -142,7 +190,7 @@ table.ledger .row-actions button.del:hover{ background:var(--loss-tint); border-
 /* ---------- App shell (authenticated pages) ---------- */
 .shell{ display:flex; min-height:100vh; }
 .sidebar{
-  width:var(--sidebar-w); flex-shrink:0; background:var(--ink); color:var(--paper);
+  width:var(--sidebar-w); flex-shrink:0; background:var(--sidebar-bg); color:var(--sidebar-ink);
   display:flex; flex-direction:column; position:fixed; top:0; bottom:0; left:0; z-index:40;
 }
 .sidebar .brand{
@@ -162,11 +210,11 @@ table.ledger .row-actions button.del:hover{ background:var(--loss-tint); border-
   border-left:2px solid transparent;
 }
 .sidebar nav .nav-link .ico{ width:1.1em; text-align:center; opacity:.85; }
-.sidebar nav .nav-link:hover{ background:rgba(238,234,224,.06); color:var(--paper); text-decoration:none; }
+.sidebar nav .nav-link:hover{ background:rgba(238,234,224,.06); color:var(--sidebar-ink); text-decoration:none; }
 .sidebar nav .nav-link.active{ background:rgba(165,115,46,.16); color:var(--white); border-left-color:var(--brass); font-weight:600; }
 .sidebar .sidebar-foot{ padding:1rem 1.4rem 1.3rem; border-top:1px solid rgba(238,234,224,.12); }
 .sidebar .sidebar-foot .who{ font-size:.8rem; color:#9AA4B8; margin-bottom:.6em; }
-.sidebar .sidebar-foot .who strong{ color:var(--paper); display:block; font-weight:600; font-size:.86rem; }
+.sidebar .sidebar-foot .who strong{ color:var(--sidebar-ink); display:block; font-weight:600; font-size:.86rem; }
 
 .main{ flex:1; margin-left:var(--sidebar-w); min-height:100vh; display:flex; flex-direction:column; }
 .topbar{
@@ -231,7 +279,7 @@ table.ledger .row-actions button.del:hover{ background:var(--loss-tint); border-
 .pub-nav .links a:hover{ color:var(--ink); text-decoration:none; }
 
 .auth-wrap{ min-height:100vh; display:flex; }
-.auth-side{ flex:1.1; background:var(--ink); color:var(--paper); padding:4vw; display:flex; flex-direction:column; justify-content:space-between; }
+.auth-side{ flex:1.1; background:var(--sidebar-bg); color:var(--sidebar-ink); padding:4vw; display:flex; flex-direction:column; justify-content:space-between; }
 .auth-form-side{ flex:1; display:flex; align-items:center; justify-content:center; padding:2.5rem; }
 .auth-form-side .auth-box{ width:100%; max-width:380px; }
 .ledger-quote{ font-family:var(--font-display); font-size:1.6rem; line-height:1.35; max-width:420px; }
@@ -262,10 +310,10 @@ table.ledger td input.inline-edit{
   .main{ margin-left:0; }
   .topbar{ display:none; }
   .mobile-topbar{
-    display:flex; align-items:center; gap:1rem; padding:1rem 1.2rem; background:var(--ink); color:var(--paper);
+    display:flex; align-items:center; gap:1rem; padding:1rem 1.2rem; background:var(--sidebar-bg); color:var(--sidebar-ink);
     position:sticky; top:0; z-index:30;
   }
-  .mobile-topbar button{ background:transparent; border:1px solid rgba(238,234,224,.3); color:var(--paper); border-radius:var(--radius); padding:.35em .6em; }
+  .mobile-topbar button{ background:transparent; border:1px solid rgba(238,234,224,.3); color:var(--sidebar-ink); border-radius:var(--radius); padding:.35em .6em; }
   .mobile-topbar .name{ font-family:var(--font-display); font-size:1.05rem; }
   .sidebar-backdrop{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:35; }
   .sidebar-backdrop.open{ display:block; }

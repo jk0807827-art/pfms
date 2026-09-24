@@ -4,10 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create account — PFMS</title>
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem('pfms-theme');
+    if(!t){ t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){}
+})();
+</script>
 
 <link rel="stylesheet" href="assets/css/style.css">
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="assets/js/theme.js" defer></script>
 </head>
 
 <body>
@@ -24,6 +34,9 @@
   <div class="links">
     <a href="index.php">Home</a>
     <a href="about.php">About</a>
+    <button type="button" class="theme-toggle" aria-label="Toggle dark mode">
+      <span class="ico" data-theme-icon>&#9789;</span><span data-theme-label>Dark mode</span>
+    </button>
     <a href="login.php">Log in</a>
     <a class="btn-ledger brass sm" href="register.php">Get started</a>
   </div>
